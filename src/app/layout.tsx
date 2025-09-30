@@ -87,8 +87,8 @@ import { Suspense } from "react"
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'AI Research Dashboard',
-  description: 'Market intelligence and research dashboard',
+  title: 'Form builder Pro',
+  description: 'Form buildong and data collection platform',
 };
 
 export default function RootLayout({
