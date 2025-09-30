@@ -3,10 +3,11 @@ import { prisma } from '@/lib/prisma'
 import { submissionSchema } from '@/lib/validations/forms'
 
 export async function POST(
-  request: NextRequest,
-  { params }: { params: { shareId: string } }
+ request: NextRequest,
+  { params }: { params: Promise<{ shareId: string }> }
 ) {
   try {
+     const { shareId } = await params
     const body = await request.json()
     console.log('Raw submission data received:', body)
     
@@ -14,11 +15,11 @@ export async function POST(
 
     // Find form by shareId
     const form = await prisma.form.findUnique({
-      where: { shareId: params.shareId },
+      where: { shareId },
     })
 
     if (!form) {
-      console.log('Form not found with shareId:', params.shareId)
+      console.log('Form not found with shareId:', shareId)
       return NextResponse.json({ error: 'Form not found' }, { status: 404 })
     }
 

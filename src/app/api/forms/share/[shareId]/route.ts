@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { shareId: string } }
+   request: NextRequest,
+  { params }: { params: Promise<{ shareId: string }> }
 ) {
   try {
+    const { shareId } = await params
     const form = await prisma.form.findUnique({
-      where: { shareId: params.shareId },
+      where: {shareId },
       select: {
         id: true,
         title: true,

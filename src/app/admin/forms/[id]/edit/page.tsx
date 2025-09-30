@@ -12,7 +12,7 @@ export default function EditFormPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [initialData, setInitialData] = useState<FormData | null>(null)
   const [loading, setLoading] = useState(true)
-  const params = useParams<{ id: string }>();
+  const params = useParams();
   // const id = params.id;
 
   useEffect(() => {
