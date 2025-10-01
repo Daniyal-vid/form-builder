@@ -1,14 +1,19 @@
-'use client'
-
+"use client"
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import FormBuilder from '@/components/FormBuilder'
 import { FormData } from '@/lib/validations/forms'
 import { requireAuth } from '@/lib/auth-guard'
 
-export default async function CreateFormPage() {
-  await requireAuth()
-  const router = useRouter()
+export default  function CreateFormPage() {
+  // await requireAuth()
+  //  const session =  require
+  const router = useRouter()  
+  const session =  requireAuth()
+  
+   if (!session) {
+     router.push('/login')
+   }
 
   const [isLoading, setIsLoading] = useState(false)
 

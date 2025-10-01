@@ -100,13 +100,13 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         {/* <Providers> */}
-            <ThemeProvider attribute="class" defaultTheme="light" enableSystem = {true}>
+            {/* <ThemeProvider attribute="class" defaultTheme="light" enableSystem = {true}> */}
 <Suspense fallback={null}>
           {children}
             <Toaster position="top-center" richColors closeButton />
                </Suspense>
 
-              </ThemeProvider>
+              {/* </ThemeProvider> */}
 
         {/* </Providers> */}
       </body>

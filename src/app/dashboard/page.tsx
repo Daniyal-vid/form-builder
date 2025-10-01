@@ -120,9 +120,9 @@ import { requireAuth } from "@/lib/auth-guard"
 export default async function DashboardPage() {
   // const session = await auth()
   const session = await requireAuth()
-  // if (!session?.user?.id) {
-  //   redirect("/auth/login")
-  // }
+  if (!session?.user?.id) {
+    redirect("/login")
+  }
 
   const forms = await prisma.form.findMany({
     where: { userId: session.user!.id },
