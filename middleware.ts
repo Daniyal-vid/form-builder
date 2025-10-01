@@ -21,27 +21,37 @@
 // }
 
 
-import { auth } from './auth'
-import { NextResponse } from 'next/server'
+// import { auth } from './auth'
+// import { NextResponse } from 'next/server'
 
-export default auth((req) => {
-  const { pathname } = req.nextUrl
+// export default auth((req) => {
+//   const { pathname } = req.nextUrl
 
-  // Protect dashboard and form management routes
-  if (pathname.startsWith('/dashboard') || pathname.startsWith('/forms/create') || pathname.includes('/edit')) {
-    if (!req.auth) {
-      return NextResponse.redirect(new URL('/auth/login', req.url))
-    }
-  }
+//   // Protect dashboard and form management routes
+//   if (pathname.startsWith('/dashboard') || pathname.startsWith('/forms/create') || pathname.includes('/edit')) {
+//     if (!req.auth) {
+//       return NextResponse.redirect(new URL('/auth/login', req.url))
+//     }
+//   }
 
-  return NextResponse.next()
-})
+//   return NextResponse.next()
+// })
+
+// export const config = {
+//   matcher: [
+//     '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
+//   ],
+// }
+
+
+
+// middleware.ts - Delete or simplify to:
+export { auth as middleware } from "./auth"
 
 export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
-  ],
+  matcher: ["/dashboard/:path*", "/forms/create/:path*", "/admin/:path*"],
 }
+
 
 // middleware.ts
 // import { auth } from './auth'
