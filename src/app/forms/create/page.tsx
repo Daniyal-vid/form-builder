@@ -4,9 +4,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import FormBuilder from '@/components/FormBuilder'
 import { FormData } from '@/lib/validations/forms'
+import { requireAuth } from '@/lib/auth-guard'
 
-export default function CreateFormPage() {
+export default async function CreateFormPage() {
+  await requireAuth()
   const router = useRouter()
+
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSave = async (formData: FormData) => {

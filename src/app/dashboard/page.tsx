@@ -115,15 +115,17 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Eye, Edit, BarChart, FileText, Users, TrendingUp, Clock } from "lucide-react"
+import { requireAuth } from "@/lib/auth-guard"
 
 export default async function DashboardPage() {
-  const session = await auth()
-  if (!session?.user?.id) {
-    redirect("/auth/login")
-  }
+  // const session = await auth()
+  const session = await requireAuth()
+  // if (!session?.user?.id) {
+  //   redirect("/auth/login")
+  // }
 
   const forms = await prisma.form.findMany({
-    where: { userId: session.user.id },
+    where: { userId: session.user!.id },
     orderBy: { createdAt: "desc" },
     include: {
       _count: {
