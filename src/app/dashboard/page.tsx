@@ -107,25 +107,37 @@
 //     </div>
 //   )
 // }
-
+// app/admin/dashboard/page.tsx
 import { auth } from "../../../auth"
-import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Eye, Edit, BarChart, FileText, Users, TrendingUp, Clock } from "lucide-react"
-import { requireAuth } from "@/lib/auth-guard"
+import {
+  Plus,
+  Eye,
+  Edit,
+  BarChart,
+  FileText,
+  Users,
+  TrendingUp,
+  Clock,
+} from "lucide-react"
+import DashboardActions from "@/components/DashboardActions"
 
 export default async function DashboardPage() {
-  // const session = await auth()
-  const session = await requireAuth()
+  const session = await auth()
+
   if (!session?.user?.id) {
-    redirect("/login")
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>You must be logged in</p>
+      </div>
+    )
   }
 
   const forms = await prisma.form.findMany({
-    where: { userId: session.user!.id },
+    where: { userId: session.user.id },
     orderBy: { createdAt: "desc" },
     include: {
       _count: {
@@ -135,7 +147,10 @@ export default async function DashboardPage() {
   })
 
   const totalForms = forms.length
-  const totalSubmissions = forms.reduce((sum, form) => sum + form._count.submissions, 0)
+  const totalSubmissions = forms.reduce(
+    (sum, form) => sum + form._count.submissions,
+    0
+  )
   const activeForms = forms.filter((form) => form.status === "ACTIVE").length
 
   return (
@@ -146,60 +161,64 @@ export default async function DashboardPage() {
           <div className="container mx-auto px-6 py-3 bg-white">
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
               <div className="space-y-2">
-                <h1 className="text-4xl font-bold tracking-tight text-balance">Welcome back</h1>
-                <p className="text-lg text-muted-foreground text-pretty">
+                <h1 className="text-4xl font-bold tracking-tight">
+                  Welcome back
+                </h1>
+                <p className="text-lg text-muted-foreground">
                   Manage your forms and track their performance
                 </p>
               </div>
-              <Button size="lg" className="shadow-lg" asChild>
-                <Link href="/forms/create">
-                  <Plus className="w-5 h-5 mr-2" />
-                  Create New Form
-                </Link>
-              </Button>
+              <DashboardActions />
             </div>
           </div>
         </div>
       </div>
 
+      {/* Stats */}
       <div className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-xl bg-primary/10">
                   <FileText className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Forms</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Total Forms
+                  </p>
                   <p className="text-3xl font-bold">{totalForms}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-xl bg-chart-2/10">
                   <Users className="w-6 h-6 text-chart-2" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Submissions</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Total Submissions
+                  </p>
                   <p className="text-3xl font-bold">{totalSubmissions}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-xl bg-chart-3/10">
                   <TrendingUp className="w-6 h-6 text-chart-3" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Active Forms</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Active Forms
+                  </p>
                   <p className="text-3xl font-bold">{activeForms}</p>
                 </div>
               </div>
@@ -207,17 +226,18 @@ export default async function DashboardPage() {
           </Card>
         </div>
 
+        {/* Forms list */}
         {forms.length === 0 ? (
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card>
             <CardContent className="text-center py-16">
               <div className="mx-auto w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                 <FileText className="w-12 h-12 text-primary" />
               </div>
-              <h3 className="text-2xl font-semibold mb-3 text-balance">No forms yet</h3>
-              <p className="text-muted-foreground mb-8 max-w-md mx-auto text-pretty">
-                Create your first form to start collecting responses and insights from your audience
+              <h3 className="text-2xl font-semibold mb-3">No forms yet</h3>
+              <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+                Create your first form to start collecting responses
               </p>
-              <Button size="lg" className="shadow-lg" asChild>
+              <Button size="lg" asChild>
                 <Link href="/forms/create">
                   <Plus className="w-5 h-5 mr-2" />
                   Create Your First Form
@@ -235,18 +255,15 @@ export default async function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {forms.map((form: any) => (
-                <Card
-                  key={form.id}
-                  className="group border-border/50 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-200 hover:shadow-lg hover:shadow-primary/5"
-                >
+              {forms.map((form) => (
+                <Card key={form.id}>
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between gap-3">
-                      <CardTitle className="text-lg font-semibold line-clamp-2 group-hover:text-primary transition-colors">
+                      <CardTitle className="text-lg font-semibold line-clamp-2">
                         {form.title}
                       </CardTitle>
                       <div
-                        className={`px-3 py-1 text-xs font-medium rounded-full shrink-0 ${
+                        className={`px-3 py-1 text-xs font-medium rounded-full ${
                           form.status === "ACTIVE"
                             ? "bg-chart-3/10 text-chart-3 border border-chart-3/20"
                             : "bg-muted text-muted-foreground border border-border"
@@ -256,65 +273,65 @@ export default async function DashboardPage() {
                       </div>
                     </div>
                     {form.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2 mt-2">{form.description}</p>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        {form.description}
+                      </p>
                     )}
                   </CardHeader>
 
                   <CardContent className="space-y-6">
+                    {/* Stats */}
                     <div className="grid grid-cols-2 gap-4">
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4 text-muted-foreground" />
                         <div>
-                          <p className="text-sm font-medium">{form._count.submissions}</p>
-                          <p className="text-xs text-muted-foreground">Submissions</p>
+                          <p className="text-sm font-medium">
+                            {form._count.submissions}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Submissions
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <FileText className="w-4 h-4 text-muted-foreground" />
                         <div>
-                          <p className="text-sm font-medium">{(form.fields as any[]).length}</p>
+                          <p className="text-sm font-medium">
+                            {(form.fields as any[]).length}
+                          </p>
                           <p className="text-xs text-muted-foreground">Fields</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
+                    {/* Share URL */}
+                    <div className="p-3 rounded-lg bg-muted/50 border">
                       <div className="flex items-center gap-2 mb-1">
                         <Clock className="w-3 h-3 text-muted-foreground" />
-                        <p className="text-xs font-medium text-muted-foreground">Share URL</p>
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Share URL
+                        </p>
                       </div>
-                      <p className="text-xs font-mono text-foreground/80 break-all">/f/{form.shareId}</p>
+                      <p className="text-xs font-mono break-all">
+                        /f/{form.shareId}
+                      </p>
                     </div>
 
+                    {/* Actions */}
                     <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 hover:bg-primary/10 hover:text-primary hover:border-primary/20 bg-transparent"
-                        asChild
-                      >
+                      <Button variant="outline" size="sm" asChild>
                         <Link href={`/f/${form.shareId}`} target="_blank">
                           <Eye className="w-4 h-4 mr-2" />
                           View
                         </Link>
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 hover:bg-chart-2/10 hover:text-chart-2 hover:border-chart-2/20 bg-transparent"
-                        asChild
-                      >
+                      <Button variant="outline" size="sm" asChild>
                         <Link href={`/admin/forms/${form.id}/edit`}>
                           <Edit className="w-4 h-4 mr-2" />
                           Edit
                         </Link>
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 hover:bg-chart-3/10 hover:text-chart-3 hover:border-chart-3/20 bg-transparent"
-                        asChild
-                      >
+                      <Button variant="outline" size="sm" asChild>
                         <Link href={`/admin/forms/${form.id}/submissions`}>
                           <BarChart className="w-4 h-4 mr-2" />
                           Stats
